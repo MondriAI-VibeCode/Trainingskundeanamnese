@@ -1,0 +1,1550 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trainingskunde: Anamnese in de Sport (Periode 2 - Les 1)</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- jsPDF voor het genereren van het PDF-certificaat -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome voor sportieve & medische iconen -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        sportblue: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#0f172a',
+                        },
+                        sportteal: {
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Subtiele animaties en custom scrollbar */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.35s ease-out forwards;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+        .animate-shake {
+            animation: shake 0.3s ease-in-out;
+        }
+        .drag-over {
+            border-color: #0d9488 !important;
+            background-color: #f0fdfa !important;
+            transform: scale(1.01);
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col font-sans selection:bg-teal-500 selection:text-white">
+
+    <!-- Vaste Bovenbalk met Voortgang -->
+    <header class="bg-slate-900 text-white shadow-lg sticky top-0 z-40">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <div class="bg-teal-500 text-slate-950 p-2.5 rounded-xl font-bold shadow-md">
+                    <i class="fa-solid fa-clipboard-user text-xl"></i>
+                </div>
+                <div>
+                    <span class="text-xs font-semibold uppercase tracking-wider text-teal-400 block">Sport &amp; Bewegen • Trainingskunde</span>
+                    <h1 class="text-base sm:text-lg font-bold leading-tight">Periode 2, Les 1: De Anamnese</h1>
+                </div>
+            </div>
+
+            <!-- Studentbadge & Voortgangsindicatie -->
+            <div id="header-status" class="hidden items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
+                <div class="flex items-center gap-2 bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700 text-xs sm:text-sm">
+                    <i class="fa-solid fa-user-graduate text-teal-400"></i>
+                    <span id="display-student-info" class="font-medium truncate max-w-[180px]"></span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs text-slate-400 hidden md:inline">Voortgang:</span>
+                    <div class="w-24 sm:w-32 bg-slate-800 h-2.5 rounded-full overflow-hidden border border-slate-700">
+                        <div id="global-progress-bar" class="bg-gradient-to-r from-teal-400 to-blue-500 h-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                    <span id="global-progress-text" class="text-xs font-bold text-teal-400">0%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Module Stappenbalk -->
+        <nav id="module-nav" class="hidden bg-slate-800/90 border-t border-slate-700/80 overflow-x-auto">
+            <div class="max-w-6xl mx-auto px-4 py-2 flex items-center justify-between min-w-[600px] gap-2 text-xs font-medium">
+                <button onclick="navigateToStep(1)" id="nav-step-1" class="step-pill flex items-center gap-2 px-3 py-1.5 rounded-lg transition">
+                    <span class="w-5 h-5 rounded-full flex items-center justify-center bg-slate-700 text-white font-bold text-[11px]">1</span>
+                    <span>Theorie &amp; Kennischeck</span>
+                </button>
+                <i class="fa-solid fa-chevron-right text-slate-600"></i>
+                <button onclick="navigateToStep(2)" id="nav-step-2" class="step-pill flex items-center gap-2 px-3 py-1.5 rounded-lg transition">
+                    <span class="w-5 h-5 rounded-full flex items-center justify-center bg-slate-700 text-white font-bold text-[11px]">2</span>
+                    <span>Vragen Categoriseren (24)</span>
+                </button>
+                <i class="fa-solid fa-chevron-right text-slate-600"></i>
+                <button onclick="navigateToStep(3)" id="nav-step-3" class="step-pill flex items-center gap-2 px-3 py-1.5 rounded-lg transition">
+                    <span class="w-5 h-5 rounded-full flex items-center justify-center bg-slate-700 text-white font-bold text-[11px]">3</span>
+                    <span>Vlaggen &amp; Gesprek</span>
+                </button>
+                <i class="fa-solid fa-chevron-right text-slate-600"></i>
+                <button onclick="navigateToStep(4)" id="nav-step-4" class="step-pill flex items-center gap-2 px-3 py-1.5 rounded-lg transition">
+                    <span class="w-5 h-5 rounded-full flex items-center justify-center bg-slate-700 text-white font-bold text-[11px]">4</span>
+                    <span>Eigen Anamnese</span>
+                </button>
+                <i class="fa-solid fa-chevron-right text-slate-600"></i>
+                <button onclick="navigateToStep(5)" id="nav-step-5" class="step-pill flex items-center gap-2 px-3 py-1.5 rounded-lg transition">
+                    <span class="w-5 h-5 rounded-full flex items-center justify-center bg-slate-700 text-white font-bold text-[11px]">5</span>
+                    <span>PDF Bewijs</span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hoofdcontainer -->
+    <main class="flex-grow max-w-6xl w-full mx-auto px-4 py-6 sm:py-8">
+
+        <!-- Meldingsbalk (vervangt alert) -->
+        <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none px-4 sm:px-0"></div>
+
+        <!-- ========================================================= -->
+        <!-- STAP 0: WELKOM & STUDENTGEGEVENS                          -->
+        <!-- ========================================================= -->
+        <section id="step-0" class="max-w-xl mx-auto bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden animate-fade-in">
+            <div class="bg-gradient-to-br from-slate-900 via-blue-950 to-teal-900 p-6 sm:p-8 text-white relative overflow-hidden">
+                <div class="relative z-10">
+                    <span class="inline-block bg-teal-500/20 text-teal-300 border border-teal-400/30 text-xs font-semibold px-3 py-1 rounded-full mb-3">
+                        Interactieve E-Learning Module
+                    </span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold mb-2">Meester in de Anamnese</h2>
+                    <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+                        Leer hoe je als sportleider een professioneel intakegesprek voert, welke vragen bij welke categorie horen en hoe je rode en gele vlaggen herkent.
+                    </p>
+                </div>
+                <i class="fa-solid fa-heart-pulse text-8xl text-white/5 absolute -right-4 -bottom-4"></i>
+            </div>
+
+            <div class="p-6 sm:p-8">
+                <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6 flex items-start gap-3">
+                    <i class="fa-solid fa-certificate text-blue-600 text-xl mt-0.5"></i>
+                    <div class="text-sm text-blue-900">
+                        <p class="font-semibold">Bewijs van afronding (PDF)</p>
+                        <p class="text-blue-700 mt-0.5">Na het afronden van de 4 onderdelen kun je direct een officieel PDF-certificaat met jouw scores en eigen vragen downloaden voor in je portfolio of Teams.</p>
+                    </div>
+                </div>
+
+                <form id="start-form" class="space-y-4">
+                    <div>
+                        <label for="student-name" class="block text-sm font-semibold text-slate-700 mb-1">Voor- en achternaam <span class="text-red-500">*</span></label>
+                        <input type="text" id="student-name" required placeholder="Bijv. Sam de Vries"
+                            class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition text-slate-900">
+                    </div>
+                    <div>
+                        <label for="student-class" class="block text-sm font-semibold text-slate-700 mb-1">Klas / Groep <span class="text-red-500">*</span></label>
+                        <input type="text" id="student-class" required placeholder="Bijv. SB2A"
+                            class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition text-slate-900">
+                    </div>
+                    <button type="submit"
+                        class="w-full bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-md hover:shadow-lg transition flex items-center justify-center gap-2 text-base mt-2">
+                        <span>Start de Module</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- STAP 1: MODULE 1 - THEORIE & KENNISCHECK                  -->
+        <!-- ========================================================= -->
+        <section id="step-1" class="hidden space-y-6 animate-fade-in">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4 mb-6">
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-teal-600">Module 1 van 4</span>
+                        <h2 class="text-2xl font-extrabold text-slate-900">Theorie &amp; Kennischeck</h2>
+                        <p class="text-slate-600 text-sm mt-1">Bestudeer eerst de lesstof uit de presentatie op de infokaarten en maak daarna de kennischeck (5 vragen).</p>
+                    </div>
+                    <div class="bg-slate-100 px-4 py-2 rounded-xl text-xs font-semibold text-slate-700 flex items-center gap-2 self-start">
+                        <i class="fa-solid fa-lightbulb text-amber-500 text-base"></i>
+                        <span>Tip: Klik op de kaarten om details te bekijken</span>
+                    </div>
+                </div>
+
+                <!-- Interactieve Theorie Kaarten Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
+                    <!-- Kaart 1: Wat & Waarom -->
+                    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 hover:border-blue-300 transition">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center font-bold">
+                                <i class="fa-solid fa-magnifying-glass-chart text-lg"></i>
+                            </div>
+                            <h3 class="font-bold text-lg text-slate-900">1. Wat is anamnese &amp; waarom?</h3>
+                        </div>
+                        <p class="text-sm text-slate-600 leading-relaxed mb-3">
+                            Een <strong>anamnese (intake)</strong> is het verzamelen van informatie over de gezondheid, klachten, blessures, medische voorgeschiedenis, leefstijl en doelen van een sporter.
+                        </p>
+                        <ul class="text-sm text-slate-700 space-y-1.5 bg-white p-3.5 rounded-xl border border-slate-200/80">
+                            <li class="flex items-start gap-2"><i class="fa-solid fa-check text-teal-600 mt-1"></i><span>Goed beeld krijgen van de <strong>hulpvraag</strong> van de klant.</span></li>
+                            <li class="flex items-start gap-2"><i class="fa-solid fa-check text-teal-600 mt-1"></i><span>Inzicht in <strong>risicofactoren</strong> en aandachtspunten.</span></li>
+                            <li class="flex items-start gap-2"><i class="fa-solid fa-check text-teal-600 mt-1"></i><span>Basis voor <strong>veilige, effectieve en persoonlijke</strong> begeleiding &amp; trainingsplan.</span></li>
+                        </ul>
+                    </div>
+
+                    <!-- Kaart 2: De 4 Categorieën -->
+                    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 hover:border-teal-300 transition">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 rounded-xl bg-teal-100 text-teal-700 flex items-center justify-center font-bold">
+                                <i class="fa-solid fa-layer-group text-lg"></i>
+                            </div>
+                            <h3 class="font-bold text-lg text-slate-900">2. De 4 Anamnese-categorieën</h3>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+                            <div class="bg-white p-3 rounded-xl border border-blue-200">
+                                <span class="font-bold text-blue-700 block mb-1"><i class="fa-solid fa-id-card mr-1"></i> Algemene anamnese</span>
+                                <p class="text-slate-600">Persoonlijke gegevens: naam, leeftijd, geslacht, adres, beroep, zorgverzekering.</p>
+                            </div>
+                            <div class="bg-white p-3 rounded-xl border border-emerald-200">
+                                <span class="font-bold text-emerald-700 block mb-1"><i class="fa-solid fa-person-running mr-1"></i> Sportanamnese</span>
+                                <p class="text-slate-600">Sportgeschiedenis, huidige sporten, beweegmomenten, intensiteit, schema &amp; doelen.</p>
+                            </div>
+                            <div class="bg-white p-3 rounded-xl border border-rose-200">
+                                <span class="font-bold text-rose-700 block mb-1"><i class="fa-solid fa-heart-pulse mr-1"></i> Gezondheidsanamnese</span>
+                                <p class="text-slate-600">Klachten, blessures, medicatie, allergieën, roken/alcohol, slaap, voeding &amp; erfelijke ziekten.</p>
+                            </div>
+                            <div class="bg-white p-3 rounded-xl border border-purple-200">
+                                <span class="font-bold text-purple-700 block mb-1"><i class="fa-solid fa-users mr-1"></i> Sociale anamnese</span>
+                                <p class="text-slate-600">Leefstijl, gezin/relatie, werk-privébalans, hobby's, steun, financiën &amp; stress/coping.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Kaart 3: Uitvoering & Gesprekstechnieken -->
+                    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 hover:border-indigo-300 transition">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold">
+                                <i class="fa-solid fa-comments text-lg"></i>
+                            </div>
+                            <h3 class="font-bold text-lg text-slate-900">3. Hoe voer je een anamnese uit?</h3>
+                        </div>
+                        <ul class="text-sm text-slate-700 space-y-2">
+                            <li class="bg-white p-2.5 rounded-xl border border-slate-200/80 flex items-start gap-2.5">
+                                <i class="fa-solid fa-list-check text-indigo-600 mt-1"></i>
+                                <span><strong>Gestructureerd interview:</strong> Werk volgens een vaste opbouw zodat je niets vergeet.</span>
+                            </li>
+                            <li class="bg-white p-2.5 rounded-xl border border-slate-200/80 flex items-start gap-2.5">
+                                <i class="fa-solid fa-arrows-left-right text-indigo-600 mt-1"></i>
+                                <span><strong>Open &amp; gesloten vragen afwisselen:</strong> Gebruik <em>LSD</em> (Luisteren, Samenvatten, Doorvragen) en terugkoppelen.</span>
+                            </li>
+                            <li class="bg-white p-2.5 rounded-xl border border-slate-200/80 flex items-start gap-2.5">
+                                <i class="fa-solid fa-file-pen text-indigo-600 mt-1"></i>
+                                <span><strong>Schriftelijk vastleggen:</strong> Noteer alles overzichtelijk in een verslag als startpunt voor het trainingsplan.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Kaart 4: Aandachtspunten & Rode/Gele Vlaggen -->
+                    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 hover:border-amber-300 transition">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold">
+                                <i class="fa-solid fa-flag text-lg"></i>
+                            </div>
+                            <h3 class="font-bold text-lg text-slate-900">4. Vaardigheden &amp; Vlaggen</h3>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-2.5">
+                            Zorg voor een <strong>professionele houding</strong> (respectvol, empathisch, objectief, vertrouwelijk), <strong>goede voorbereiding</strong> (rustige ruimte, tijd) en <strong>duidelijke communicatie</strong>. Onderscheid hoofd- en bijzaken:
+                        </p>
+                        <div class="space-y-2 text-xs">
+                            <div class="bg-red-50 border border-red-200 p-3 rounded-xl flex items-start gap-2.5">
+                                <i class="fa-solid fa-flag text-red-600 text-base mt-0.5"></i>
+                                <div>
+                                    <span class="font-bold text-red-800">Rode vlaggen (Medisch alarm!):</span>
+                                    <p class="text-red-700">Signalen die wijzen op een ernstige medische aandoening (bijv. pijn op de borst, duizeligheid/flauwvallen, onverklaarbaar gewichtsverlies). <strong>Actie:</strong> Niet starten met trainen, direct doorverwijzen naar (huis)arts!</p>
+                                </div>
+                            </div>
+                            <div class="bg-amber-50 border border-amber-200 p-3 rounded-xl flex items-start gap-2.5">
+                                <i class="fa-solid fa-flag text-amber-500 text-base mt-0.5"></i>
+                                <div>
+                                    <span class="font-bold text-amber-900">Gele vlaggen (Psychosociaal):</span>
+                                    <p class="text-amber-800">Psychosociale factoren die klachten of herstel beïnvloeden (bijv. hoge werkstress, bewegingsangst, slechte werk-privébalans, weinig sociale steun). <strong>Actie:</strong> Rekening mee houden in belasting en begeleiding.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kennischeck Quiz -->
+                <div class="bg-slate-900 text-white rounded-2xl p-6 sm:p-8">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6">
+                        <div>
+                            <h3 class="text-xl font-bold flex items-center gap-2">
+                                <i class="fa-solid fa-circle-question text-teal-400"></i>
+                                Kennischeck: Test je basiskennis
+                            </h3>
+                            <p class="text-slate-400 text-sm">Beantwoord alle 5 vragen om door te gaan naar Module 2.</p>
+                        </div>
+                        <span id="quiz-score-badge" class="bg-slate-800 border border-slate-700 px-3.5 py-1.5 rounded-xl text-sm font-bold text-teal-400 self-start">
+                            Score: 0 / 5
+                        </span>
+                    </div>
+
+                    <div id="quiz-container" class="space-y-6"></div>
+
+                    <div class="mt-6 pt-6 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <p id="quiz-status-msg" class="text-sm text-slate-400">Beantwoord alle vragen om je resultaat te bekijken.</p>
+                        <button id="btn-finish-step-1" disabled onclick="completeStep1()"
+                            class="w-full sm:w-auto bg-teal-500 disabled:bg-slate-700 disabled:text-slate-500 hover:bg-teal-400 text-slate-950 font-bold py-3 px-6 rounded-xl transition flex items-center justify-center gap-2 cursor-not-allowed">
+                            <span>Door naar Module 2: Vragen Sorteren</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- STAP 2: MODULE 2 - DE GROTE VRAGEN-SORTEERUITDAGING         -->
+        <!-- ========================================================= -->
+        <section id="step-2" class="hidden space-y-6 animate-fade-in">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-100 pb-4 mb-5">
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-teal-600">Module 2 van 4</span>
+                        <h2 class="text-2xl font-extrabold text-slate-900">De Grote Vragen-Sorteeruitdaging</h2>
+                        <p class="text-slate-600 text-sm mt-1">
+                            Plaats alle <strong>24 anamnesevragen</strong> in de juiste categorie. Sleep de actieve vraag naar de juiste box <em>of</em> klik op de juiste categorieknop!
+                        </p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-3">
+                        <div class="bg-blue-50 border border-blue-200 px-3.5 py-2 rounded-xl text-xs font-bold text-blue-800">
+                            Voortgang: <span id="sort-progress">0</span> / 24
+                        </div>
+                        <div class="bg-emerald-50 border border-emerald-200 px-3.5 py-2 rounded-xl text-xs font-bold text-emerald-800">
+                            In 1x goed: <span id="sort-score">0</span>
+                        </div>
+                        <div class="bg-amber-50 border border-amber-200 px-3.5 py-2 rounded-xl text-xs font-bold text-amber-800">
+                            <i class="fa-solid fa-fire text-amber-500 mr-1"></i>Combo: <span id="sort-combo">0</span>x
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actieve Vraag Kaart (Sleepbaar & Klikbaar) -->
+                <div id="active-question-area" class="mb-6">
+                    <div id="question-card-wrapper" class="bg-gradient-to-r from-slate-900 to-blue-950 rounded-2xl p-6 text-white shadow-lg relative">
+                        <div class="flex items-center justify-between text-xs text-teal-300 font-semibold mb-2">
+                            <span><i class="fa-solid fa-hand-pointer mr-1.5"></i>Sleep deze vraag naar een categorie of klik hieronder op de juiste box:</span>
+                            <span id="remaining-count-badge" class="bg-white/10 px-2.5 py-0.5 rounded-full">Nog 24 te gaan</span>
+                        </div>
+                        <div id="draggable-question" draggable="true"
+                            class="bg-white text-slate-900 p-5 rounded-xl shadow-md border-2 border-teal-400 cursor-grab active:cursor-grabbing select-none transition transform hover:scale-[1.005]">
+                            <p id="current-sort-question-text" class="text-base sm:text-lg font-bold text-center">
+                                Vraag wordt geladen...
+                            </p>
+                        </div>
+                        <!-- Directe feedback balk bij fout of goed antwoord -->
+                        <div id="sort-feedback-box" class="hidden mt-4 p-3.5 rounded-xl text-sm font-medium flex items-start gap-3"></div>
+                    </div>
+                </div>
+
+                <!-- De 4 Categorie Dropzones / Knoppen -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- Categorie 1: Algemene anamnese -->
+                    <div data-category="algemeen" onclick="handleCategorySelect('algemeen')"
+                        class="drop-zone cursor-pointer bg-blue-50/70 hover:bg-blue-50 border-2 border-dashed border-blue-300 rounded-2xl p-4 flex flex-col transition min-h-[260px]">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="bg-blue-600 text-white text-xs font-bold px-2.5 py-1 rounded-lg flex items-center gap-1.5">
+                                <i class="fa-solid fa-id-card"></i> Algemeen
+                            </span>
+                            <span id="count-algemeen" class="text-xs font-bold text-blue-800 bg-blue-100 px-2 py-0.5 rounded-full">0/6</span>
+                        </div>
+                        <p class="text-[11px] text-blue-800/80 mb-3">Persoonsgegevens, beroep, bereikbaarheid, verzekering.</p>
+                        <ul id="list-algemeen" class="space-y-1.5 flex-grow text-xs"></ul>
+                    </div>
+
+                    <!-- Categorie 2: Sportanamnese -->
+                    <div data-category="sport" onclick="handleCategorySelect('sport')"
+                        class="drop-zone cursor-pointer bg-emerald-50/70 hover:bg-emerald-50 border-2 border-dashed border-emerald-300 rounded-2xl p-4 flex flex-col transition min-h-[260px]">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="bg-emerald-600 text-white text-xs font-bold px-2.5 py-1 rounded-lg flex items-center gap-1.5">
+                                <i class="fa-solid fa-person-running"></i> Sport
+                            </span>
+                            <span id="count-sport" class="text-xs font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full">0/6</span>
+                        </div>
+                        <p class="text-[11px] text-emerald-800/80 mb-3">Sportactiviteiten, historie, schema, intensiteit, doelen.</p>
+                        <ul id="list-sport" class="space-y-1.5 flex-grow text-xs"></ul>
+                    </div>
+
+                    <!-- Categorie 3: Gezondheidsanamnese -->
+                    <div data-category="gezondheid" onclick="handleCategorySelect('gezondheid')"
+                        class="drop-zone cursor-pointer bg-rose-50/70 hover:bg-rose-50 border-2 border-dashed border-rose-300 rounded-2xl p-4 flex flex-col transition min-h-[260px]">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="bg-rose-600 text-white text-xs font-bold px-2.5 py-1 rounded-lg flex items-center gap-1.5">
+                                <i class="fa-solid fa-heart-pulse"></i> Gezondheid
+                            </span>
+                            <span id="count-gezondheid" class="text-xs font-bold text-rose-800 bg-rose-100 px-2 py-0.5 rounded-full">0/6</span>
+                        </div>
+                        <p class="text-[11px] text-rose-800/80 mb-3">Klachten, blessures, medicatie, roken/alcohol, slaap &amp; voeding.</p>
+                        <ul id="list-gezondheid" class="space-y-1.5 flex-grow text-xs"></ul>
+                    </div>
+
+                    <!-- Categorie 4: Sociale anamnese -->
+                    <div data-category="sociaal" onclick="handleCategorySelect('sociaal')"
+                        class="drop-zone cursor-pointer bg-purple-50/70 hover:bg-purple-50 border-2 border-dashed border-purple-300 rounded-2xl p-4 flex flex-col transition min-h-[260px]">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="bg-purple-600 text-white text-xs font-bold px-2.5 py-1 rounded-lg flex items-center gap-1.5">
+                                <i class="fa-solid fa-users"></i> Sociaal
+                            </span>
+                            <span id="count-sociaal" class="text-xs font-bold text-purple-800 bg-purple-100 px-2 py-0.5 rounded-full">0/6</span>
+                        </div>
+                        <p class="text-[11px] text-purple-800/80 mb-3">Thuissituatie, netwerk, werk-privébalans, stress, vrije tijd.</p>
+                        <ul id="list-sociaal" class="space-y-1.5 flex-grow text-xs"></ul>
+                    </div>
+                </div>
+
+                <!-- Afrondknop Module 2 -->
+                <div class="mt-6 pt-5 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <button onclick="resetSortingChallenge()" class="text-xs font-semibold text-slate-500 hover:text-slate-800 underline">
+                        <i class="fa-solid fa-rotate-right mr-1"></i> Sorteeropdracht opnieuw starten
+                    </button>
+                    <button id="btn-finish-step-2" disabled onclick="completeStep2()"
+                        class="w-full sm:w-auto bg-teal-600 disabled:bg-slate-300 disabled:text-slate-500 hover:bg-teal-700 text-white font-bold py-3 px-6 rounded-xl transition flex items-center justify-center gap-2 cursor-not-allowed">
+                        <span>Door naar Module 3: Praktijkcasussen</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- STAP 3: MODULE 3 - RODE & GELE VLAGGEN + GESPREKSTECHNIEK -->
+        <!-- ========================================================= -->
+        <section id="step-3" class="hidden space-y-6 animate-fade-in">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4 mb-6">
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-teal-600">Module 3 van 4</span>
+                        <h2 class="text-2xl font-extrabold text-slate-900">Praktijkcasussen: Vlaggen &amp; Gesprekstechnieken</h2>
+                        <p class="text-slate-600 text-sm mt-1">Tijdens een intakegesprek moet je kritisch analyseren en professioneel reageren. Wat doe jij in deze 4 situaties?</p>
+                    </div>
+                    <span id="cases-score-badge" class="bg-blue-50 border border-blue-200 text-blue-800 px-4 py-2 rounded-xl text-sm font-bold self-start">
+                        Score: 0 / 4
+                    </span>
+                </div>
+
+                <div id="cases-container" class="space-y-6"></div>
+
+                <div class="mt-6 pt-5 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <p id="cases-status-msg" class="text-sm text-slate-500">Rond alle 4 de praktijkcasussen af om verder te gaan.</p>
+                    <button id="btn-finish-step-3" disabled onclick="completeStep3()"
+                        class="w-full sm:w-auto bg-teal-600 disabled:bg-slate-300 disabled:text-slate-500 hover:bg-teal-700 text-white font-bold py-3 px-6 rounded-xl transition flex items-center justify-center gap-2 cursor-not-allowed">
+                        <span>Door naar Module 4: Eigen Anamnese</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- STAP 4: MODULE 4 - ZELF EEN ANAMNESE-OPZET MAKEN          -->
+        <!-- ========================================================= -->
+        <section id="step-4" class="hidden space-y-6 animate-fade-in">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                <div class="border-b border-slate-100 pb-4 mb-6">
+                    <span class="text-xs font-bold uppercase tracking-wider text-teal-600">Module 4 van 4</span>
+                    <h2 class="text-2xl font-extrabold text-slate-900">Zelf een Anamnese-opzet maken</h2>
+                    <p class="text-slate-600 text-sm mt-1">
+                        Kies hieronder een sporter als casus en bedenk voor elk van de 4 categorieën <strong>1 goede, open anamnesevraag</strong>. Jouw vragen worden direct meegenomen op je PDF-certificaat!
+                    </p>
+                </div>
+
+                <!-- Casus Kiezer -->
+                <div class="mb-6">
+                    <label class="block text-sm font-bold text-slate-800 mb-3">1. Kies je sporter-profiel:</label>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="persona-cards">
+                        <div onclick="selectPersona(0)" id="persona-0"
+                            class="persona-card cursor-pointer border-2 border-teal-500 bg-teal-50/50 rounded-2xl p-4 transition">
+                            <div class="flex items-center gap-3 mb-2">
+                                <span class="w-9 h-9 rounded-full bg-teal-600 text-white flex items-center justify-center font-bold"><i class="fa-solid fa-person-running"></i></span>
+                                <div>
+                                    <h4 class="font-bold text-slate-900 text-sm">Mark (42 jaar)</h4>
+                                    <span class="text-xs text-teal-700 font-medium">Beginnende hardloper</span>
+                                </div>
+                            </div>
+                            <p class="text-xs text-slate-600">Heeft een drukke kantoorbaan (45 uur/week), 8 kg overgewicht en wil over 4 maanden zijn eerste 10 km lopen.</p>
+                        </div>
+
+                        <div onclick="selectPersona(1)" id="persona-1"
+                            class="persona-card cursor-pointer border-2 border-slate-200 hover:border-teal-300 bg-white rounded-2xl p-4 transition">
+                            <div class="flex items-center gap-3 mb-2">
+                                <span class="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold"><i class="fa-solid fa-futbol"></i></span>
+                                <div>
+                                    <h4 class="font-bold text-slate-900 text-sm">Lotte (19 jaar)</h4>
+                                    <span class="text-xs text-blue-700 font-medium">Selectievoetbalster</span>
+                                </div>
+                            </div>
+                            <p class="text-xs text-slate-600">Komt terug van een zware enkelblessure, studeert HBO en voelt druk om snel weer in de basis te staan.</p>
+                        </div>
+
+                        <div onclick="selectPersona(2)" id="persona-2"
+                            class="persona-card cursor-pointer border-2 border-slate-200 hover:border-teal-300 bg-white rounded-2xl p-4 transition">
+                            <div class="flex items-center gap-3 mb-2">
+                                <span class="w-9 h-9 rounded-full bg-purple-600 text-white flex items-center justify-center font-bold"><i class="fa-solid fa-dumbbell"></i></span>
+                                <div>
+                                    <h4 class="font-bold text-slate-900 text-sm">Fatima (56 jaar)</h4>
+                                    <span class="text-xs text-purple-700 font-medium">Revalidatie &amp; Fitness</span>
+                                </div>
+                            </div>
+                            <p class="text-xs text-slate-600">Wil na een periode van rugklachten en mantelzorg weer veilig werken aan kracht, conditie en ontspanning.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4 Invulvelden voor Eigen Vragen -->
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <label class="block text-sm font-bold text-slate-800">2. Formuleer 1 passende vraag per categorie (minimaal 15 tekens per vraag):</label>
+                        <span class="text-xs text-slate-500 hidden sm:inline"><i class="fa-solid fa-wand-magic-sparkles text-teal-600 mr-1"></i>Tip: Begin met Wie, Wat, Waar, Wanneer of Hoe</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Algemeen -->
+                        <div class="bg-blue-50/60 border border-blue-200 rounded-2xl p-4">
+                            <label for="custom-q-algemeen" class="block text-xs font-bold uppercase tracking-wider text-blue-800 mb-1.5">
+                                <i class="fa-solid fa-id-card mr-1"></i> Algemene anamnese
+                            </label>
+                            <textarea id="custom-q-algemeen" rows="2" placeholder="Bijv. Welke werkzaamheden voert u uit tijdens uw werkdag en hoe lang zit of staat u?"
+                                class="w-full p-3 rounded-xl border border-blue-200 focus:ring-2 focus:ring-blue-500 outline-none text-sm bg-white"></textarea>
+                        </div>
+
+                        <!-- Sport -->
+                        <div class="bg-emerald-50/60 border border-emerald-200 rounded-2xl p-4">
+                            <label for="custom-q-sport" class="block text-xs font-bold uppercase tracking-wider text-emerald-800 mb-1.5">
+                                <i class="fa-solid fa-person-running mr-1"></i> Sportanamnese
+                            </label>
+                            <textarea id="custom-q-sport" rows="2" placeholder="Bijv. Welke sportervaring heeft u uit het verleden en hoe zag uw trainingsopbouw er toen uit?"
+                                class="w-full p-3 rounded-xl border border-emerald-200 focus:ring-2 focus:ring-emerald-500 outline-none text-sm bg-white"></textarea>
+                        </div>
+
+                        <!-- Gezondheid -->
+                        <div class="bg-rose-50/60 border border-rose-200 rounded-2xl p-4">
+                            <label for="custom-q-gezondheid" class="block text-xs font-bold uppercase tracking-wider text-rose-800 mb-1.5">
+                                <i class="fa-solid fa-heart-pulse mr-1"></i> Gezondheidsanamnese
+                            </label>
+                            <textarea id="custom-q-gezondheid" rows="2" placeholder="Bijv. Welke specifieke klachten ervaart u op dit moment en wanneer treden deze precies op?"
+                                class="w-full p-3 rounded-xl border border-rose-200 focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white"></textarea>
+                        </div>
+
+                        <!-- Sociaal -->
+                        <div class="bg-purple-50/60 border border-purple-200 rounded-2xl p-4">
+                            <label for="custom-q-sociaal" class="block text-xs font-bold uppercase tracking-wider text-purple-800 mb-1.5">
+                                <i class="fa-solid fa-users mr-1"></i> Sociale anamnese
+                            </label>
+                            <textarea id="custom-q-sociaal" rows="2" placeholder="Bijv. Hoeveel ruimte heeft u in uw weekplanning en thuissituatie om structureel te trainen en te herstellen?"
+                                class="w-full p-3 rounded-xl border border-purple-200 focus:ring-2 focus:ring-purple-500 outline-none text-sm bg-white"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 pt-5 border-t border-slate-100 flex justify-end">
+                    <button onclick="completeStep4()"
+                        class="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white font-bold py-3.5 px-8 rounded-xl shadow-md hover:shadow-lg transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-award"></i>
+                        <span>Module Afronden &amp; Certificaat Bekijken</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- STAP 5: EINDRESULTAAT & PDF CERTIFICAAT DOWNLOADEN        -->
+        <!-- ========================================================= -->
+        <section id="step-5" class="hidden space-y-6 animate-fade-in">
+            <div class="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+                <!-- Feestelijke Header -->
+                <div class="bg-gradient-to-r from-slate-900 via-blue-950 to-teal-900 p-6 sm:p-10 text-white text-center relative overflow-hidden">
+                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-teal-500 text-slate-950 text-3xl mb-4 shadow-lg">
+                        <i class="fa-solid fa-trophy"></i>
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold">Gefeliciteerd, <span id="cert-preview-name" class="text-teal-400"></span>!</h2>
+                    <p class="text-slate-300 text-sm sm:text-base mt-2 max-w-2xl mx-auto">
+                        Je hebt de interactieve e-learning module <strong>Anamnese in de Sport</strong> afgerond. Download hieronder jouw officiële bewijs van deelname als PDF.
+                    </p>
+                </div>
+
+                <div class="p-6 sm:p-8 space-y-6">
+                    <!-- Score Overzicht Kaarten -->
+                    <div class="grid grid-cols-2 lg:grid-cols-5 gap-3">
+                        <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-center">
+                            <span class="text-xs text-slate-500 block">1. Kennischeck</span>
+                            <span id="final-score-1" class="text-xl font-extrabold text-slate-900 mt-1 block">-</span>
+                        </div>
+                        <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-center">
+                            <span class="text-xs text-slate-500 block">2. Vragen Sorteren</span>
+                            <span id="final-score-2" class="text-xl font-extrabold text-slate-900 mt-1 block">-</span>
+                        </div>
+                        <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-center">
+                            <span class="text-xs text-slate-500 block">3. Praktijkcasussen</span>
+                            <span id="final-score-3" class="text-xl font-extrabold text-slate-900 mt-1 block">-</span>
+                        </div>
+                        <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-center">
+                            <span class="text-xs text-slate-500 block">4. Eigen Opzet</span>
+                            <span id="final-score-4" class="text-xl font-extrabold text-teal-600 mt-1 block">Compleet</span>
+                        </div>
+                        <div class="col-span-2 lg:col-span-1 bg-blue-900 text-white rounded-xl p-4 text-center shadow-md">
+                            <span class="text-xs text-teal-300 font-semibold block">Totaalscore</span>
+                            <span id="final-score-total" class="text-2xl font-extrabold mt-1 block">-</span>
+                        </div>
+                    </div>
+
+                    <!-- Statusmelding (Voldoende / Herkansing optie) -->
+                    <div id="result-banner" class="p-4 rounded-xl border flex flex-col sm:flex-row items-center justify-between gap-4"></div>
+
+                    <!-- Voorvertoning van het Certificaat -->
+                    <div class="border-2 border-slate-200 rounded-2xl p-6 bg-slate-50/70">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-4 mb-4">
+                            <div>
+                                <span class="text-xs font-bold uppercase tracking-wider text-teal-600">Voorvertoning Bewijsstuk</span>
+                                <h3 class="text-lg font-bold text-slate-900">Certificaat van Afronding – Trainingskunde</h3>
+                            </div>
+                            <span class="text-xs font-mono bg-white border border-slate-300 px-3 py-1 rounded-lg text-slate-700">
+                                Code: <strong id="cert-preview-code"></strong>
+                            </span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm mb-5">
+                            <div>
+                                <span class="text-xs text-slate-500 block">Student</span>
+                                <strong id="cert-meta-name" class="text-slate-900"></strong>
+                            </div>
+                            <div>
+                                <span class="text-xs text-slate-500 block">Klas / Groep</span>
+                                <strong id="cert-meta-class" class="text-slate-900"></strong>
+                            </div>
+                            <div>
+                                <span class="text-xs text-slate-500 block">Datum &amp; Tijdstip</span>
+                                <strong id="cert-meta-date" class="text-slate-900"></strong>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-xl border border-slate-200 p-4">
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">
+                                Zelf opgestelde anamnesevragen (Casus: <span id="cert-meta-persona" class="text-slate-800"></span>)
+                            </h4>
+                            <ul id="cert-preview-questions" class="space-y-2 text-xs sm:text-sm text-slate-700"></ul>
+                        </div>
+                    </div>
+
+                    <!-- Grote Download Knop -->
+                    <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
+                        <button onclick="generatePDFCertificate()"
+                            class="w-full sm:w-auto bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-extrabold py-4 px-8 rounded-2xl shadow-lg hover:shadow-xl transition flex items-center justify-center gap-3 text-base">
+                            <i class="fa-solid fa-file-pdf text-xl"></i>
+                            <span>Download Bewijs van Afronding (PDF)</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500 mt-auto">
+        MBO Sport &amp; Bewegen • Trainingskunde Periode 2, Les 1: Anamnese
+    </footer>
+
+    <!-- ========================================================= -->
+    <!-- JAVASCRIPT LOGICA                                         -->
+    <!-- ========================================================= -->
+    <script>
+        // --- APPLICATIE STATE ---
+        const appState = {
+            studentName: '',
+            studentClass: '',
+            currentStep: 0,
+            completedSteps: [false, false, false, false, false],
+            // Module 1: Quiz
+            quizAnswers: {},
+            quizScore: 0,
+            // Module 2: 24 Vragen Sorteren
+            sortQueue: [],
+            currentSortIndex: 0,
+            sortFirstTryCorrect: 0,
+            sortCombo: 0,
+            hadErrorOnCurrent: false,
+            sortedLists: { algemeen: [], sport: [], gezondheid: [], sociaal: [] },
+            // Module 3: Casussen
+            caseAnswers: {},
+            caseScore: 0,
+            // Module 4: Eigen vragen
+            selectedPersona: 0,
+            customQuestions: { algemeen: '', sport: '', gezondheid: '', sociaal: '' },
+            // Eindresultaat
+            completionDateStr: '',
+            verificationCode: ''
+        };
+
+        // --- DATA: MODULE 1 (KENNISCHECK QUIZ) ---
+        const quizData = [
+            {
+                q: "1. Wat is het belangrijkste doel van een anamnese voor een sportleider?",
+                options: [
+                    "Alleen controleren of de klant zijn contributie op tijd kan betalen.",
+                    "Een goed beeld krijgen van de sporter, de hulpvraag en eventuele risicofactoren voor een veilig en effectief trainingsplan.",
+                    "Direct een maximale inspanningstest afnemen zonder eerst te praten.",
+                    "Alleen de medische diagnose stellen bij zware sportblessures."
+                ],
+                correct: 1,
+                explanation: "Juist! Een anamnese geeft inzicht in de sporter, hulpvraag, risicofactoren en aandachtspunten als basis voor veilige en persoonlijke begeleiding."
+            },
+            {
+                q: "2. Onder welke anamnese-categorie vallen vragen over rookgedrag, slaappatroon en medicijngebruik?",
+                options: [
+                    "Algemene anamnese",
+                    "Sportanamnese",
+                    "Gezondheidsanamnese",
+                    "Sociale anamnese"
+                ],
+                correct: 2,
+                explanation: "Klopt! Volgens de lesstof horen roken, slaap, medicatie, klachten en blessures thuis bij de gezondheidsanamnese."
+            },
+            {
+                q: "3. Wat betekent het herkennen van een 'rode vlag' tijdens de anamnese?",
+                options: [
+                    "De sporter heeft weinig tijd door een drukke baan.",
+                    "De sporter vindt hardlopen minder leuk dan krachttraining.",
+                    "Er zijn signalen die wijzen op een ernstige medische aandoening; je verwijst direct door naar een arts.",
+                    "De sporter heeft nog nooit eerder een hartslagmeter gebruikt."
+                ],
+                correct: 2,
+                explanation: "Precies! Rode vlaggen zijn medische alarmsignalen waarbij je niet zomaar gaat trainen maar doorverwijst naar een (huis)arts."
+            },
+            {
+                q: "4. Wat zijn 'gele vlaggen' bij een sporter?",
+                options: [
+                    "Psychosociale factoren die klachten of herstel beïnvloeden, zoals stress, angst of een slechte werk-privébalans.",
+                    "Allergieën voor bepaalde voedingsmiddelen of pollen.",
+                    "Persoonsgegevens zoals adres en zorgverzekering.",
+                    "De warming-up en cooling-down van het trainingsschema."
+                ],
+                correct: 0,
+                explanation: "Goed gedaan! Gele vlaggen zijn psychosociale factoren (zoals stress, angst of gebrek aan steun) die het herstel en de belastbaarheid beïnvloeden."
+            },
+            {
+                q: "5. Welke gespreksvaardigheden zijn essentieel tijdens het afnemen van een gestructureerd anamnese-interview?",
+                options: [
+                    "Alleen gesloten vragen stellen zodat het gesprek binnen 2 minuten klaar is.",
+                    "Open en gesloten vragen afwisselen, doorvragen, samenvatten, terugkoppelen en een schriftelijk verslag maken.",
+                    "Zelf zoveel mogelijk aan het woord zijn en direct advies geven zonder te luisteren.",
+                    "Geen aantekeningen maken zodat je alles uit je hoofd moet onthouden."
+                ],
+                correct: 1,
+                explanation: "Uitstekend! Een goed anamnese-interview wisselt open en gesloten vragen af, gebruikt doorvragen/samenvatten/terugkoppelen en wordt schriftelijk vastgelegd."
+            }
+        ];
+
+        // --- DATA: MODULE 2 (24 VRAGEN UIT HET WORD-DOCUMENT & PPT) ---
+        const allSortingQuestions = [
+            // Algemene anamnese (6)
+            { text: "Wat is uw naam, leeftijd, geslacht, adres en telefoonnummer?", category: "algemeen", reason: "Dit zijn basis persoons- en contactgegevens (Algemene anamnese)." },
+            { text: "Wat is uw beroep of studie en hoeveel uur per week werkt u?", category: "algemeen", reason: "Beroep en arbeidsuren horen bij de algemene achtergrondgegevens (Algemene anamnese)." },
+            { text: "Bij welke zorgverzekeraar bent u verzekerd en wie is uw noodcontact?", category: "algemeen", reason: "Verzekeringsgegevens en noodcontacten horen bij de administratieve basisgegevens (Algemene anamnese)." },
+            { text: "Wat is uw geboortedatum en huidige woonplaats?", category: "algemeen", reason: "Demografische basisgegevens vallen onder de Algemene anamnese." },
+            { text: "Hoe is uw bereikbaarheid overdag voor het maken of verzetten van afspraken?", category: "algemeen", reason: "Praktische bereikbaarheid hoort bij de algemene klantgegevens (Algemene anamnese)." },
+            { text: "Bent u op eigen initiatief gekomen of via een doorverwijzing (bijv. huisarts of fysio)?", category: "algemeen", reason: "De aanmeldwijze/verwijzing hoort bij de algemene intakegegevens (Algemene anamnese)." },
+
+            // Sportanamnese (6)
+            { text: "Welke sport(en) beoefent u en hoe vaak, hoe lang en hoe intensief?", category: "sport", reason: "Dit brengt de huidige sportactiviteiten en beweegmomenten in kaart (Sportanamnese)." },
+            { text: "Heeft u een specifiek doel of een wedstrijd waar u voor traint?", category: "sport", reason: "Sportdoelen en prestatiewensen vormen de kern van de Sportanamnese." },
+            { text: "Hoe lang doet u al aan deze sport(en) en wat is uw sportervaring?", category: "sport", reason: "Sportgeschiedenis en ervaring vallen onder de Sportanamnese." },
+            { text: "Hoe ziet uw trainingsschema eruit? Doet u aan warming-up en cooling-down?", category: "sport", reason: "Trainingsopbouw en gewoonten tijdens het sporten horen bij de Sportanamnese." },
+            { text: "Gebruikt u een hartslagmeter of ander hulpmiddel om uw inspanning te meten?", category: "sport", reason: "Inspanningsmeting en trainingsmiddelen horen bij de Sportanamnese." },
+            { text: "Wat vindt u leuk en wat vindt u minder leuk aan sporten?", category: "sport", reason: "Sportvoorkeuren en motivatie voor beweegvormen horen bij de Sportanamnese." },
+
+            // Gezondheidsanamnese (6)
+            { text: "Heeft u momenteel klachten of blessures die uw sportbeoefening belemmeren?", category: "gezondheid", reason: "Huidige lichamelijke klachten en blessures horen bij de Gezondheidsanamnese." },
+            { text: "Gebruikt u medicijnen, supplementen of dopingmiddelen die invloed hebben op uw gezondheid?", category: "gezondheid", reason: "Medicatie- en middelengebruik is cruciale medische informatie (Gezondheidsanamnese)." },
+            { text: "Heeft u chronische ziekten, allergieën of astma waar rekening mee gehouden moet worden?", category: "gezondheid", reason: "Medische voorgeschiedenis, chronische aandoeningen en allergieën vallen onder de Gezondheidsanamnese." },
+            { text: "Heeft u ooit last gehad van duizeligheid, flauwvallen of hartkloppingen tijdens of na het sporten?", category: "gezondheid", reason: "Dit zijn medische alarmsignalen (rode vlaggen) binnen de Gezondheidsanamnese." },
+            { text: "Hoe is uw slaappatroon en voedingspatroon? Eet en slaapt u voldoende en regelmatig?", category: "gezondheid", reason: "Slaap, herstel en voeding behoren volgens de lesstof tot de Gezondheidsanamnese." },
+            { text: "Rookt u, drinkt u alcohol of gebruikt u drugs? Zo ja, hoeveel en hoe vaak?", category: "gezondheid", reason: "Middelengebruik (roken/alcohol/drugs) staat in de lesstof onder de Gezondheidsanamnese." },
+
+            // Sociale anamnese (6)
+            { text: "Met wie woont u samen en heeft u kinderen of andere zorgtaken?", category: "sociaal", reason: "Gezinssamenstelling en thuissituatie vallen onder de Sociale anamnese." },
+            { text: "Hoe is uw sociale netwerk en heeft u vrienden of familie die u steunen?", category: "sociaal", reason: "Sociale steun vanuit omgeving en netwerk hoort bij de Sociale anamnese." },
+            { text: "Hoe ervaart u uw werk- en privébalans?", category: "sociaal", reason: "De verhouding tussen werk en privéleven is onderdeel van de Sociale anamnese." },
+            { text: "Hoe gaat u om met stress en spanningen in uw leven?", category: "sociaal", reason: "Stressfactoren en copingstrategieën horen bij de Sociale anamnese." },
+            { text: "Hoe is uw vrijetijdsbesteding en heeft u voldoende tijd om te ontspannen naast het sporten?", category: "sociaal", reason: "Hobby's en vrijetijdsbesteding buiten het sporten horen bij de Sociale anamnese." },
+            { text: "Hoe is uw financiële situatie en heeft u voldoende middelen om structureel te sporten?", category: "sociaal", reason: "Maatschappelijke en financiële omstandigheden vallen onder de Sociale anamnese." }
+        ];
+
+        // --- DATA: MODULE 3 (PRAKTIJKCASUSSEN) ---
+        const casesData = [
+            {
+                id: 0,
+                title: "Casus 1: De duizelige hardloper",
+                dialogue: "Sporter (51 jaar): \"Tijdens het hardlopen voel ik de laatste twee weken soms een drukkend gevoel op mijn borst en word ik licht in mijn hoofd als ik versnel.\"",
+                question: "Welk signaal herken je hier en wat is jouw professionele actie?",
+                options: [
+                    "Gele vlag: Ik geef hem een rustiger hardloopschema mee en kijk het twee weken aan.",
+                    "Rode vlag: Dit wijst mogelijk op een ernstig hart-/vaatprobleem. Ik start geen training en verwijs direct door naar de huisarts.",
+                    "Sportanamnese: Ik vraag of hij wel een goede warming-up doet voor het versnellen."
+                ],
+                correct: 1,
+                feedback: "Spot on! Pijn/druk op de borst en duizeligheid bij inspanning zijn klassieke RODE VLAGGEN. Veiligheid staat altijd op 1: eerst medisch laten beoordelen door een arts."
+            },
+            {
+                id: 1,
+                title: "Casus 2: Angst na herstel",
+                dialogue: "Sporter (24 jaar): \"Mijn fysiotherapeut heeft mijn knie volledig vrijgegeven, maar ik durf eigenlijk niet voluit te springen. Bovendien heb ik momenteel veel stress door mijn afstuderen en slaap ik slecht.\"",
+                question: "Hoe analyseer je deze situatie vanuit de anamnese-lesstof?",
+                options: [
+                    "Rode vlag: Hij moet meteen terug naar het ziekenhuis voor een MRI-scan.",
+                    "Gele vlaggen: Bewegingsangst en hoge stress beïnvloeden zijn belastbaarheid en herstel. Ik pas de opbouw geleidelijk aan en bied vertrouwen.",
+                    "Algemene anamnese: Ik noteer alleen dat hij student is en ga direct zwaar trainen."
+                ],
+                correct: 1,
+                feedback: "Heel goed! Bewegingsangst en stress zijn GELE VLAGGEN (psychosociale factoren). Medisch is hij fit, maar mentaal en qua stressbelasting moet je hier slim rekening mee houden."
+            },
+            {
+                id: 2,
+                title: "Casus 3: Het vage antwoord",
+                dialogue: "Sportleider: \"Heeft u last van blessures?\" — Sporter: \"Ja, ik heb gewoon vaak last van mijn schouder.\"",
+                question: "Welke gesprekstechniek pas je nu direct toe?",
+                options: [
+                    "Doorvragen met open vragen (bijv. 'Waar precies, wanneer ontstaat de pijn en wat verergert het?').",
+                    "Snel doorgaan naar de sociale anamnese om tijd te besparen.",
+                    "Een gesloten vraag stellen: 'Dus het valt eigenlijk wel mee?'"
+                ],
+                correct: 0,
+                feedback: "Uitstekend! Bij vage antwoorden gebruik je open vragen om door te vragen naar locatie, ontstaan, duur en provocerende momenten."
+            },
+            {
+                id: 3,
+                title: "Casus 4: Afronden van het gesprek",
+                dialogue: "Je hebt alle vier de onderdelen van de anamnese besproken en veel informatie verzameld over doelen, werk en klachten.",
+                question: "Hoe sluit je het anamnesegesprek professioneel af volgens de lesstof?",
+                options: [
+                    "Je zegt 'Bedankt, tot volgende week!' en gooit je aantekeningen weg.",
+                    "Je geeft een duidelijke samenvatting, koppelt terug of alles klopt en legt de informatie vast in een schriftelijk verslag voor het trainingsplan.",
+                    "Je begint meteen aan een nieuw gesprek met de volgende klant terwijl deze nog zijn jas aantrekt."
+                ],
+                correct: 1,
+                feedback: "Precies! Samenvatten, terugkoppelen en schriftelijk vastleggen zorgen ervoor dat er geen misverstanden zijn en vormen de basis voor het trainingsplan."
+            }
+        ];
+
+        const personas = [
+            "Mark (42 jr, beginnende hardloper, kantoorbaan)",
+            "Lotte (19 jr, selectievoetbalster, herstellend van enkelblessure)",
+            "Fatima (56 jr, fitness & revalidatie, rugklachten en mantelzorg)"
+        ];
+
+        // --- INITIALISATIE & NAVIGATIE ---
+        document.getElementById('start-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const nameInput = document.getElementById('student-name').value.trim();
+            const classInput = document.getElementById('student-class').value.trim();
+
+            if (!nameInput || !classInput) {
+                showToast("Vul zowel je voor- en achternaam als je klas in.", "error");
+                return;
+            }
+
+            appState.studentName = nameInput;
+            appState.studentClass = classInput;
+
+            document.getElementById('display-student-info').textContent = `${appState.studentName} (${appState.studentClass})`;
+            document.getElementById('header-status').classList.remove('hidden');
+            document.getElementById('header-status').classList.add('flex');
+            document.getElementById('module-nav').classList.remove('hidden');
+
+            initQuiz();
+            initSortingChallenge();
+            initCases();
+
+            navigateToStep(1);
+            showToast(`Welkom ${appState.studentName}! Veel succes met de module.`, "success");
+        });
+
+        function navigateToStep(stepNumber) {
+            // Alleen navigeren naar behaalde stappen of huidige stap
+            if (stepNumber > 1 && !appState.completedSteps[stepNumber - 1] && stepNumber > appState.currentStep) {
+                showToast("Rond eerst de huidige module af voordat je verdergaat.", "warning");
+                return;
+            }
+
+            appState.currentStep = stepNumber;
+
+            // Verberg alle secties
+            for (let i = 0; i <= 5; i++) {
+                const el = document.getElementById(`step-${i}`);
+                if (el) el.classList.add('hidden');
+            }
+
+            // Toon gekozen sectie
+            const target = document.getElementById(`step-${stepNumber}`);
+            if (target) {
+                target.classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            updateNavPills();
+            updateGlobalProgress();
+        }
+
+        function updateNavPills() {
+            for (let i = 1; i <= 5; i++) {
+                const pill = document.getElementById(`nav-step-${i}`);
+                if (!pill) continue;
+                const badge = pill.querySelector('span:first-child');
+
+                pill.className = "step-pill flex items-center gap-2 px-3 py-1.5 rounded-lg transition ";
+                if (appState.currentStep === i) {
+                    pill.className += "bg-teal-500/20 text-teal-300 border border-teal-500/40 font-bold";
+                    badge.className = "w-5 h-5 rounded-full flex items-center justify-center bg-teal-400 text-slate-950 font-bold text-[11px]";
+                } else if (appState.completedSteps[i]) {
+                    pill.className += "text-emerald-400 hover:bg-slate-700/60";
+                    badge.className = "w-5 h-5 rounded-full flex items-center justify-center bg-emerald-500 text-white font-bold text-[11px]";
+                    badge.innerHTML = '<i class="fa-solid fa-check text-[10px]"></i>';
+                } else {
+                    pill.className += "text-slate-400 hover:bg-slate-700/40";
+                    badge.className = "w-5 h-5 rounded-full flex items-center justify-center bg-slate-700 text-slate-300 font-bold text-[11px]";
+                    badge.textContent = i;
+                }
+            }
+        }
+
+        function updateGlobalProgress() {
+            const doneCount = appState.completedSteps.slice(1, 5).filter(Boolean).length;
+            const pct = Math.round((doneCount / 4) * 100);
+            document.getElementById('global-progress-bar').style.width = `${pct}%`;
+            document.getElementById('global-progress-text').textContent = `${pct}%`;
+        }
+
+        // --- MODULE 1: QUIZ LOGICA ---
+        function initQuiz() {
+            const container = document.getElementById('quiz-container');
+            container.innerHTML = '';
+
+            quizData.forEach((item, qIdx) => {
+                const card = document.createElement('div');
+                card.className = "bg-slate-800/80 border border-slate-700 rounded-xl p-5";
+                card.innerHTML = `
+                    <p class="font-bold text-white text-sm sm:text-base mb-3">${item.q}</p>
+                    <div class="space-y-2" id="quiz-options-${qIdx}">
+                        ${item.options.map((opt, oIdx) => `
+                            <button type="button" onclick="selectQuizOption(${qIdx}, ${oIdx})" id="q-${qIdx}-opt-${oIdx}"
+                                class="w-full text-left p-3 rounded-xl border border-slate-600 bg-slate-800 hover:bg-slate-700/80 text-slate-200 text-xs sm:text-sm transition flex items-start gap-3">
+                                <span class="w-6 h-6 rounded-full border border-slate-500 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">${String.fromCharCode(65 + oIdx)}</span>
+                                <span>${opt}</span>
+                            </button>
+                        `).join('')}
+                    </div>
+                    <div id="quiz-fb-${qIdx}" class="hidden mt-3 p-3 rounded-xl text-xs sm:text-sm"></div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function selectQuizOption(qIdx, oIdx) {
+            if (appState.quizAnswers[qIdx] !== undefined) return; // Al beantwoord
+
+            const item = quizData[qIdx];
+            const isCorrect = (oIdx === item.correct);
+            appState.quizAnswers[qIdx] = isCorrect;
+
+            if (isCorrect) appState.quizScore++;
+
+            // Styling bijwerken
+            item.options.forEach((_, idx) => {
+                const btn = document.getElementById(`q-${qIdx}-opt-${idx}`);
+                btn.disabled = true;
+                btn.classList.remove('hover:bg-slate-700/80');
+                if (idx === item.correct) {
+                    btn.className = "w-full text-left p-3 rounded-xl border-2 border-emerald-500 bg-emerald-950/60 text-emerald-200 text-xs sm:text-sm flex items-start gap-3 font-medium";
+                } else if (idx === oIdx && !isCorrect) {
+                    btn.className = "w-full text-left p-3 rounded-xl border-2 border-rose-500 bg-rose-950/60 text-rose-200 text-xs sm:text-sm flex items-start gap-3";
+                } else {
+                    btn.className = "w-full text-left p-3 rounded-xl border border-slate-700 bg-slate-800/40 text-slate-500 text-xs sm:text-sm flex items-start gap-3";
+                }
+            });
+
+            const fbBox = document.getElementById(`quiz-fb-${qIdx}`);
+            fbBox.classList.remove('hidden');
+            fbBox.className = `mt-3 p-3 rounded-xl text-xs sm:text-sm ${isCorrect ? 'bg-emerald-900/50 text-emerald-200 border border-emerald-700' : 'bg-rose-900/50 text-rose-200 border border-rose-700'}`;
+            fbBox.innerHTML = `<i class="fa-solid ${isCorrect ? 'fa-circle-check text-emerald-400' : 'fa-circle-xmark text-rose-400'} mr-1.5"></i> ${item.explanation}`;
+
+            document.getElementById('quiz-score-badge').textContent = `Score: ${appState.quizScore} / 5`;
+
+            // Check of alle 5 vragen beantwoord zijn
+            if (Object.keys(appState.quizAnswers).length === quizData.length) {
+                const btn = document.getElementById('btn-finish-step-1');
+                btn.disabled = false;
+                btn.classList.remove('cursor-not-allowed');
+                document.getElementById('quiz-status-msg').textContent = `Klaar! Je hebt ${appState.quizScore} van de 5 vragen goed beantwoord.`;
+                document.getElementById('quiz-status-msg').classList.add('text-teal-400', 'font-semibold');
+            }
+        }
+
+        function completeStep1() {
+            appState.completedSteps[1] = true;
+            navigateToStep(2);
+        }
+
+        // --- MODULE 2: 24 VRAGEN SORTEERUITDAGING LOGICA ---
+        function shuffleArray(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function initSortingChallenge() {
+            appState.sortQueue = shuffleArray(allSortingQuestions);
+            appState.currentSortIndex = 0;
+            appState.sortFirstTryCorrect = 0;
+            appState.sortCombo = 0;
+            appState.hadErrorOnCurrent = false;
+            appState.sortedLists = { algemeen: [], sport: [], gezondheid: [], sociaal: [] };
+
+            ['algemeen', 'sport', 'gezondheid', 'sociaal'].forEach(cat => {
+                document.getElementById(`list-${cat}`).innerHTML = '';
+                document.getElementById(`count-${cat}`).textContent = '0/6';
+            });
+
+            document.getElementById('sort-progress').textContent = '0';
+            document.getElementById('sort-score').textContent = '0';
+            document.getElementById('sort-combo').textContent = '0';
+            document.getElementById('sort-feedback-box').classList.add('hidden');
+            document.getElementById('active-question-area').classList.remove('hidden');
+
+            const btnNext = document.getElementById('btn-finish-step-2');
+            btnNext.disabled = true;
+            btnNext.classList.add('cursor-not-allowed');
+
+            setupDragAndDrop();
+            renderCurrentSortQuestion();
+        }
+
+        function resetSortingChallenge() {
+            initSortingChallenge();
+            showToast("De 24 vragen zijn opnieuw geschud!", "info");
+        }
+
+        function renderCurrentSortQuestion() {
+            const total = appState.sortQueue.length;
+            const idx = appState.currentSortIndex;
+
+            if (idx >= total) {
+                // Alle 24 vragen zijn gesorteerd!
+                document.getElementById('question-card-wrapper').innerHTML = `
+                    <div class="text-center py-4">
+                        <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500 text-white text-xl mb-2">
+                            <i class="fa-solid fa-check-double"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white">Geweldig! Alle 24 vragen staan in de juiste categorie!</h3>
+                        <p class="text-teal-200 text-sm mt-1">Je hebt ${appState.sortFirstTryCorrect} van de 24 vragen direct in één keer goed geplaatst.</p>
+                    </div>
+                `;
+                const btnNext = document.getElementById('btn-finish-step-2');
+                btnNext.disabled = false;
+                btnNext.classList.remove('cursor-not-allowed');
+                return;
+            }
+
+            const currentQ = appState.sortQueue[idx];
+            document.getElementById('current-sort-question-text').textContent = `"${currentQ.text}"`;
+            document.getElementById('remaining-count-badge').textContent = `Vraag ${idx + 1} van ${total}`;
+            appState.hadErrorOnCurrent = false;
+        }
+
+        function setupDragAndDrop() {
+            const draggable = document.getElementById('draggable-question');
+            if (!draggable) return;
+
+            draggable.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('text/plain', 'active-question');
+                draggable.classList.add('opacity-60');
+            });
+
+            draggable.addEventListener('dragend', () => {
+                draggable.classList.remove('opacity-60');
+            });
+
+            document.querySelectorAll('.drop-zone').forEach(zone => {
+                zone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    zone.classList.add('drag-over');
+                });
+                zone.addEventListener('dragleave', () => {
+                    zone.classList.remove('drag-over');
+                });
+                zone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    zone.classList.remove('drag-over');
+                    const cat = zone.getAttribute('data-category');
+                    handleCategorySelect(cat);
+                });
+            });
+        }
+
+        function handleCategorySelect(selectedCategory) {
+            if (appState.currentSortIndex >= appState.sortQueue.length) return;
+
+            const currentQ = appState.sortQueue[appState.currentSortIndex];
+            const fbBox = document.getElementById('sort-feedback-box');
+            const cardEl = document.getElementById('draggable-question');
+
+            if (selectedCategory === currentQ.category) {
+                // Juist geplaatst!
+                if (!appState.hadErrorOnCurrent) {
+                    appState.sortFirstTryCorrect++;
+                    appState.sortCombo++;
+                } else {
+                    appState.sortCombo = 0;
+                }
+
+                appState.sortedLists[selectedCategory].push(currentQ.text);
+                const listEl = document.getElementById(`list-${selectedCategory}`);
+                const li = document.createElement('li');
+                li.className = "bg-white p-2 rounded-lg border border-slate-200/90 text-slate-700 shadow-xs flex items-start gap-1.5 animate-fade-in";
+                li.innerHTML = `<i class="fa-solid fa-check text-emerald-600 mt-0.5 shrink-0"></i><span>${currentQ.text}</span>`;
+                listEl.appendChild(li);
+
+                const count = appState.sortedLists[selectedCategory].length;
+                document.getElementById(`count-${selectedCategory}`).textContent = `${count}/6`;
+
+                appState.currentSortIndex++;
+                document.getElementById('sort-progress').textContent = appState.currentSortIndex;
+                document.getElementById('sort-score').textContent = appState.sortFirstTryCorrect;
+                document.getElementById('sort-combo').textContent = appState.sortCombo;
+
+                fbBox.classList.remove('hidden');
+                fbBox.className = "mt-4 p-3.5 rounded-xl text-xs sm:text-sm font-medium flex items-start gap-2.5 bg-emerald-500/20 border border-emerald-400/40 text-emerald-100";
+                fbBox.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400 text-base mt-0.5"></i><span><strong>Goed geplaatst!</strong> ${currentQ.reason}</span>`;
+
+                renderCurrentSortQuestion();
+            } else {
+                // Fout geplaatst
+                appState.hadErrorOnCurrent = true;
+                appState.sortCombo = 0;
+                document.getElementById('sort-combo').textContent = '0';
+
+                cardEl.classList.remove('animate-shake');
+                void cardEl.offsetWidth; // trigger reflow
+                cardEl.classList.add('animate-shake');
+
+                const catNames = {
+                    algemeen: "Algemene anamnese",
+                    sport: "Sportanamnese",
+                    gezondheid: "Gezondheidsanamnese",
+                    sociaal: "Sociale anamnese"
+                };
+
+                fbBox.classList.remove('hidden');
+                fbBox.className = "mt-4 p-3.5 rounded-xl text-xs sm:text-sm font-medium flex items-start gap-2.5 bg-rose-500/20 border border-rose-400/40 text-rose-100";
+                fbBox.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-rose-400 text-base mt-0.5"></i><span><strong>Niet helemaal:</strong> Dit hoort niet bij <em>${catNames[selectedCategory]}</em>. Kijk goed naar de kern van de vraag en probeer het nog eens!</span>`;
+            }
+        }
+
+        function completeStep2() {
+            appState.completedSteps[2] = true;
+            navigateToStep(3);
+        }
+
+        // --- MODULE 3: PRAKTIJKCASUSSEN LOGICA ---
+        function initCases() {
+            const container = document.getElementById('cases-container');
+            container.innerHTML = '';
+
+            casesData.forEach((c, idx) => {
+                const box = document.createElement('div');
+                box.className = "bg-slate-50 border border-slate-200 rounded-2xl p-5";
+                box.innerHTML = `
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="bg-blue-600 text-white text-xs font-bold px-2.5 py-0.5 rounded-md">${c.title}</span>
+                    </div>
+                    <blockquote class="bg-white border-l-4 border-teal-500 p-3.5 rounded-r-xl text-sm italic text-slate-700 mb-3 shadow-xs">
+                        ${c.dialogue}
+                    </blockquote>
+                    <p class="font-bold text-slate-900 text-sm mb-3">${c.question}</p>
+                    <div class="space-y-2">
+                        ${c.options.map((opt, oIdx) => `
+                            <button type="button" onclick="answerCase(${idx}, ${oIdx})" id="case-${idx}-opt-${oIdx}"
+                                class="w-full text-left p-3.5 rounded-xl border border-slate-300 bg-white hover:border-teal-500 hover:bg-teal-50/40 text-xs sm:text-sm text-slate-800 transition flex items-start gap-3">
+                                <span class="w-6 h-6 rounded-full bg-slate-100 border border-slate-300 flex items-center justify-center text-xs font-bold shrink-0">${oIdx + 1}</span>
+                                <span>${opt}</span>
+                            </button>
+                        `).join('')}
+                    </div>
+                    <div id="case-fb-${idx}" class="hidden mt-3 p-3.5 rounded-xl text-xs sm:text-sm"></div>
+                `;
+                container.appendChild(box);
+            });
+        }
+
+        function answerCase(caseIdx, optIdx) {
+            if (appState.caseAnswers[caseIdx] !== undefined) return;
+
+            const item = casesData[caseIdx];
+            const isCorrect = (optIdx === item.correct);
+            appState.caseAnswers[caseIdx] = isCorrect;
+            if (isCorrect) appState.caseScore++;
+
+            item.options.forEach((_, idx) => {
+                const btn = document.getElementById(`case-${caseIdx}-opt-${idx}`);
+                btn.disabled = true;
+                if (idx === item.correct) {
+                    btn.className = "w-full text-left p-3.5 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-950 text-xs sm:text-sm font-medium flex items-start gap-3";
+                } else if (idx === optIdx && !isCorrect) {
+                    btn.className = "w-full text-left p-3.5 rounded-xl border-2 border-rose-500 bg-rose-50 text-rose-950 text-xs sm:text-sm flex items-start gap-3";
+                } else {
+                    btn.className = "w-full text-left p-3.5 rounded-xl border border-slate-200 bg-slate-100 text-slate-400 text-xs sm:text-sm flex items-start gap-3";
+                }
+            });
+
+            const fb = document.getElementById(`case-fb-${caseIdx}`);
+            fb.classList.remove('hidden');
+            fb.className = `mt-3 p-3.5 rounded-xl text-xs sm:text-sm ${isCorrect ? 'bg-emerald-100 text-emerald-900 border border-emerald-300' : 'bg-rose-100 text-rose-900 border border-rose-300'}`;
+            fb.innerHTML = `<i class="fa-solid ${isCorrect ? 'fa-circle-check text-emerald-600' : 'fa-circle-xmark text-rose-600'} mr-1.5"></i> ${item.feedback}`;
+
+            document.getElementById('cases-score-badge').textContent = `Score: ${appState.caseScore} / 4`;
+
+            if (Object.keys(appState.caseAnswers).length === casesData.length) {
+                const btn = document.getElementById('btn-finish-step-3');
+                btn.disabled = false;
+                btn.classList.remove('cursor-not-allowed');
+                document.getElementById('cases-status-msg').textContent = `Alle casussen afgerond (${appState.caseScore}/4 goed)!`;
+                document.getElementById('cases-status-msg').classList.add('text-teal-700', 'font-semibold');
+            }
+        }
+
+        function completeStep3() {
+            appState.completedSteps[3] = true;
+            navigateToStep(4);
+        }
+
+        // --- MODULE 4: EIGEN ANAMNESE OPZET ---
+        function selectPersona(index) {
+            appState.selectedPersona = index;
+            document.querySelectorAll('.persona-card').forEach((card, idx) => {
+                if (idx === index) {
+                    card.className = "persona-card cursor-pointer border-2 border-teal-500 bg-teal-50/60 rounded-2xl p-4 transition shadow-xs";
+                } else {
+                    card.className = "persona-card cursor-pointer border-2 border-slate-200 hover:border-teal-300 bg-white rounded-2xl p-4 transition";
+                }
+            });
+        }
+
+        function completeStep4() {
+            const qAlg = document.getElementById('custom-q-algemeen').value.trim();
+            const qSpo = document.getElementById('custom-q-sport').value.trim();
+            const qGez = document.getElementById('custom-q-gezondheid').value.trim();
+            const qSoc = document.getElementById('custom-q-sociaal').value.trim();
+
+            if (qAlg.length < 12 || qSpo.length < 12 || qGez.length < 12 || qSoc.length < 12) {
+                showToast("Vul voor alle 4 de categorieën een duidelijke vraag in (minimaal 12 tekens per vraag).", "error");
+                return;
+            }
+
+            appState.customQuestions = {
+                algemeen: qAlg,
+                sport: qSpo,
+                gezondheid: qGez,
+                sociaal: qSoc
+            };
+
+            appState.completedSteps[4] = true;
+            prepareCertificateData();
+            navigateToStep(5);
+        }
+
+        // --- MODULE 5: CERTIFICAAT VOORBEREIDING & PDF GENERATIE ---
+        function prepareCertificateData() {
+            // Datum & Tijdstip in Nederlands formaat
+            const now = new Date();
+            appState.completionDateStr = now.toLocaleDateString('nl-NL', {
+                day: '2-digit', month: '2-digit', year: 'numeric'
+            }) + ' om ' + now.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
+
+            // Bereken totaalscore (Quiz 5 + Sorteren 24 + Casussen 4 = 33 punten)
+            const totalPoints = appState.quizScore + appState.sortFirstTryCorrect + appState.caseScore;
+            const maxPoints = 33;
+            const percentage = Math.round((totalPoints / maxPoints) * 100);
+            appState.totalPercentage = percentage;
+
+            // Unieke verificatiecode genereren op basis van naam, score en timestamp
+            const rawStr = `${appState.studentName}|${appState.studentClass}|${percentage}|${now.getTime()}`;
+            let hash = 0;
+            for (let i = 0; i < rawStr.length; i++) {
+                hash = ((hash << 5) - hash) + rawStr.charCodeAt(i);
+                hash |= 0;
+            }
+            const hexCode = Math.abs(hash).toString(16).toUpperCase().padStart(6, '0');
+            appState.verificationCode = `TK-P2L1-${hexCode}`;
+
+            // UI vullen
+            document.getElementById('cert-preview-name').textContent = appState.studentName;
+            document.getElementById('final-score-1').textContent = `${appState.quizScore} / 5`;
+            document.getElementById('final-score-2').textContent = `${appState.sortFirstTryCorrect} / 24`;
+            document.getElementById('final-score-3').textContent = `${appState.caseScore} / 4`;
+            document.getElementById('final-score-total').textContent = `${percentage}%`;
+
+            document.getElementById('cert-preview-code').textContent = appState.verificationCode;
+            document.getElementById('cert-meta-name').textContent = appState.studentName;
+            document.getElementById('cert-meta-class').textContent = appState.studentClass;
+            document.getElementById('cert-meta-date').textContent = appState.completionDateStr;
+            document.getElementById('cert-meta-persona').textContent = personas[appState.selectedPersona];
+
+            const qList = document.getElementById('cert-preview-questions');
+            qList.innerHTML = `
+                <li><strong class="text-blue-700">Algemene anamnese:</strong> "${escapeHtml(appState.customQuestions.algemeen)}"</li>
+                <li><strong class="text-emerald-700">Sportanamnese:</strong> "${escapeHtml(appState.customQuestions.sport)}"</li>
+                <li><strong class="text-rose-700">Gezondheidsanamnese:</strong> "${escapeHtml(appState.customQuestions.gezondheid)}"</li>
+                <li><strong class="text-purple-700">Sociale anamnese:</strong> "${escapeHtml(appState.customQuestions.sociaal)}"</li>
+            `;
+
+            const banner = document.getElementById('result-banner');
+            if (percentage >= 70) {
+                banner.className = "p-4 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-900 flex flex-col sm:flex-row items-center justify-between gap-4";
+                banner.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-circle-check text-emerald-600 text-2xl"></i>
+                        <div class="text-sm">
+                            <p class="font-bold">Voldoende behaald (${percentage}%)!</p>
+                            <p class="text-emerald-800">Je beheerst de lesstof over de anamnese goed. Download je PDF-bewijs en lever deze in via Teams.</p>
+                        </div>
+                    </div>
+                `;
+            } else {
+                banner.className = "p-4 rounded-xl border border-amber-300 bg-amber-50 text-amber-900 flex flex-col sm:flex-row items-center justify-between gap-4";
+                banner.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-circle-exclamation text-amber-600 text-2xl"></i>
+                        <div class="text-sm">
+                            <p class="font-bold">Module afgerond met ${percentage}% (advies: minimaal 70%).</p>
+                            <p class="text-amber-800">Je kunt je bewijsstuk nu al downloaden, of de sorteeruitdaging opnieuw doen om je score te verhogen.</p>
+                        </div>
+                    </div>
+                    <button onclick="navigateToStep(2); resetSortingChallenge();" class="shrink-0 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition">
+                        Verbeter score
+                    </button>
+                `;
+            }
+        }
+
+        function generatePDFCertificate() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+            // Kleurenpalet
+            const navy = [15, 23, 42];
+            const teal = [13, 148, 136];
+            const blue = [37, 99, 235];
+            const slate = [71, 85, 105];
+            const lightBg = [248, 250, 252];
+
+            // Buitenrand certificaat
+            doc.setDrawColor(...teal);
+            doc.setLineWidth(1.2);
+            doc.rect(10, 10, 190, 277);
+            doc.setDrawColor(203, 213, 225);
+            doc.setLineWidth(0.3);
+            doc.rect(13, 13, 184, 271);
+
+            // Header Blok
+            doc.setFillColor(...navy);
+            doc.rect(13, 13, 184, 42, 'F');
+
+            doc.setTextColor(45, 212, 191);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(10);
+            doc.text("MBO SPORT & BEWEGEN  |  VAK: TRAININGSKUNDE", 105, 25, { align: 'center' });
+
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(19);
+            doc.text("CERTIFICAAT VAN AFRONDING", 105, 36, { align: 'center' });
+
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(11);
+            doc.setTextColor(203, 213, 225);
+            doc.text("Periode 2, Les 1: Anamnese in de Sport", 105, 45, { align: 'center' });
+
+            // Introductietekst
+            doc.setTextColor(...slate);
+            doc.setFontSize(11);
+            doc.text("Hiermee wordt bevestigd dat de onderstaande student de interactieve e-learning", 105, 68, { align: 'center' });
+            doc.text("module en praktijkopdrachten rondom de sportanamnese heeft doorlopen:", 105, 74, { align: 'center' });
+
+            // Studentgegevens Kader
+            doc.setFillColor(...lightBg);
+            doc.setDrawColor(226, 232, 240);
+            doc.roundedRect(22, 82, 166, 32, 3, 3, 'FD');
+
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(10);
+            doc.setTextColor(...slate);
+            doc.text("Naam student:", 28, 92);
+            doc.text("Klas / Groep:", 28, 100);
+            doc.text("Datum & tijdstip:", 28, 108);
+
+            doc.setTextColor(...navy);
+            doc.setFontSize(11);
+            doc.text(appState.studentName, 70, 92);
+            doc.text(appState.studentClass, 70, 100);
+            doc.text(appState.completionDateStr, 70, 108);
+
+            // Resultaten Tabel
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(12);
+            doc.setTextColor(...navy);
+            doc.text("Behaalde Resultaten per Onderdeel", 22, 127);
+
+            const rows = [
+                ["1. Theorie & Kennischeck (Meerkeuze)", `${appState.quizScore} van de 5 vragen goed`],
+                ["2. Vragen-Sorteeruitdaging (4 categorieën)", `${appState.sortFirstTryCorrect} van de 24 in één keer goed (24/24 geplaatst)`],
+                ["3. Praktijkcasussen: Rode & Gele Vlaggen", `${appState.caseScore} van de 4 casussen goed`],
+                ["4. Zelf opgestelde Anamnesevragen", "Volledig uitgewerkt (4 categorieën)"]
+            ];
+
+            let yPos = 133;
+            rows.forEach((r, i) => {
+                doc.setFillColor(i % 2 === 0 ? 248 : 255, i % 2 === 0 ? 250 : 255, i % 2 === 0 ? 252 : 255);
+                doc.rect(22, yPos, 166, 9, 'F');
+                doc.setDrawColor(226, 232, 240);
+                doc.rect(22, yPos, 166, 9, 'S');
+
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(9.5);
+                doc.setTextColor(...navy);
+                doc.text(r[0], 25, yPos + 6);
+
+                doc.setFont('helvetica', 'bold');
+                doc.text(r[1], 185, yPos + 6, { align: 'right' });
+                yPos += 9;
+            });
+
+            // Totaalscore Balk
+            doc.setFillColor(...blue);
+            doc.rect(22, yPos, 166, 11, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(11);
+            doc.text("TOTAALSCORE MODULE:", 25, yPos + 7.5);
+            doc.text(`${appState.totalPercentage}% (${appState.totalPercentage >= 70 ? 'VOLDOENDE' : 'AFGEROND'})`, 185, yPos + 7.5, { align: 'right' });
+
+            // Eigen Anamnesevragen Sectie
+            yPos += 21;
+            doc.setTextColor(...navy);
+            doc.setFontSize(12);
+            doc.text("Uitwerking Module 4: Zelf opgestelde Anamnesevragen", 22, yPos);
+
+            yPos += 6;
+            doc.setFont('helvetica', 'italic');
+            doc.setFontSize(9.5);
+            doc.setTextColor(...slate);
+            doc.text(`Gekozen sporter-casus: ${personas[appState.selectedPersona]}`, 22, yPos);
+
+            yPos += 6;
+            const customItems = [
+                { label: "Algemene anamnese:", val: appState.customQuestions.algemeen },
+                { label: "Sportanamnese:", val: appState.customQuestions.sport },
+                { label: "Gezondheidsanamnese:", val: appState.customQuestions.gezondheid },
+                { label: "Sociale anamnese:", val: appState.customQuestions.sociaal }
+            ];
+
+            customItems.forEach(item => {
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(9.5);
+                doc.setTextColor(...teal);
+                doc.text(item.label, 22, yPos);
+                yPos += 4.5;
+
+                doc.setFont('helvetica', 'normal');
+                doc.setTextColor(...navy);
+                const splitLines = doc.splitTextToSize(`"${item.val}"`, 164);
+                doc.text(splitLines, 24, yPos);
+                yPos += (splitLines.length * 4.5) + 3;
+            });
+
+            // Footer & Verificatiecode
+            doc.setDrawColor(203, 213, 225);
+            doc.line(22, 262, 188, 262);
+
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(9);
+            doc.setTextColor(...navy);
+            doc.text(`Unieke verificatiecode: ${appState.verificationCode}`, 22, 269);
+
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(8.5);
+            doc.setTextColor(...slate);
+            doc.text("Dit document is digitaal gegenereerd door de Trainingskunde E-Learning Module.", 22, 275);
+
+            // Bestandsnaam opslaan
+            const safeName = appState.studentName.replace(/[^a-zA-Z0-9]/g, '_');
+            doc.save(`Bewijs_Anamnese_${safeName}_${appState.studentClass}.pdf`);
+            showToast("Je PDF-certificaat is gedownload!", "success");
+        }
+
+        // --- HULPFUNCTIES ---
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function showToast(message, type = "info") {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+
+            const styles = {
+                success: "bg-emerald-900 border-emerald-500 text-emerald-100",
+                error: "bg-rose-900 border-rose-500 text-rose-100",
+                warning: "bg-amber-900 border-amber-500 text-amber-100",
+                info: "bg-slate-900 border-teal-500 text-white"
+            };
+            const icons = {
+                success: "fa-circle-check text-emerald-400",
+                error: "fa-circle-xmark text-rose-400",
+                warning: "fa-triangle-exclamation text-amber-400",
+                info: "fa-circle-info text-teal-400"
+            };
+
+            toast.className = `pointer-events-auto border-l-4 p-4 rounded-xl shadow-xl text-sm font-medium flex items-center gap-3 animate-fade-in ${styles[type] || styles.info}`;
+            toast.innerHTML = `<i class="fa-solid ${icons[type] || icons.info} text-lg"></i><span>${message}</span>`;
+
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+    </script>
+</body>
+</html>
